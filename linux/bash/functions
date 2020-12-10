@@ -1,0 +1,81 @@
+Задать функцию:
+имя_функции ()
+{
+# действия
+}
+
+Вызов функции:
+...
+имя_функции
+...
+
+Функция с параметрами:
+имя_функции ()
+{
+# действия с $1, $2, ... $#
+}
+
+Вызов функции:
+...
+имя_функции арг1 арг2 ...
+...
+
+Переменные:
+имя_функции ()
+{
+    var_global=1  # переменная видна за пределами функции
+    local var_local=1  # переменная не видна за пределами функции
+}
+
+Вызов:
+имя_функции
+echo $var_global  # выведет 1
+echo $var_local  # не выведет ничего
+
+Компактная запись:
+имя функции { действие1; действие2; }  # после каждого действия необходима ";"
+
+Компактную запись можно использовать и в других конструкциях:
+if [[ условие ]]; then
+...
+for i in 1 2 3 4 5; do
+...
+
+Несколько обычных строк можно записать в одну, если разделять их ;
+
+Использование функций:
+
+
+#!/usr/bin/bash
+print_sum () { let "sum=$1+$2"; echo "$1 + $2 = $sum"; }
+print_mult () { let "mult=$1*$2"; echo "$1 * $2 = $mult"; }
+print_sum 1 2
+print_mult 3 4
+
+out:
+1 + 2 = 3
+3 * 4 = 12
+
+
+#!/bin/bash
+
+files_creator ()  # dir_name file_name 
+{
+  full_name=$1/$2
+  if [[ ! -e $1 ]]; then
+     echo "Directory does not exist, creating $1"
+     mkdir $1
+  elif [[ ! -d $1 ]]; then
+     echo "$1 is not a directory, exiting"
+     exit 1
+  fi
+  touch $1/$2
+}
+
+again="yes"
+while [[ $again == "yes" ]]; do
+  read -p "Enter dir and file names: " dir_name file_name
+  files_creator $dir_name $file_name
+  if [[ -f $full_name ]]; then echo "Created $full_name"; fi
+  read -p "Again? (yes/no): " again
+done

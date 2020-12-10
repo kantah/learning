@@ -1,0 +1,120 @@
+which - используется для поиска команд
+
+Все программы на bash имеют расширение .sh и называются скриптами или сценариями. Сам bash называется скриптовым или сценарным языком.
+Первая строка начинается с "#!", называется шебанг и указывает какую программу нужно вызвать, чтобы запустить скрипт. Указывается полный путь до программы.
+Пример скрипта:
+#! /usr/bin/bash
+echo "Hello, world!"
+
+chmod +x my_script.sh - делаем программу исполняемой
+
+./my_script.sh - запускаем скрипт
+
+bash my_script.sh - можно запустить скрипт, не только сделав его исполняемым, но и передав напрямую интерпретатору bash
+
+#! /usr/bin/bash
+echo "Going to home!"
+cd ~
+pwd
+ls
+# Going to home!
+# /home/petr
+# C:   lesson   snap   soft   Видео   Документы	 Загрузки   Изображения   Музыка   Общедоступные  'Рабочий стол'   Шаблоны
+Если после этого скрипта выполнить команду pwd, мы увидим, что находимся в той же директории, где находились до выполнения скрипта. Это связано с тем, что скрипт выполняется в своей оболочке, которая закрывается после исполнения.
+
+Имя переменной может состоять из букв, цифр и _, но, при этом не может начинаться с цифры.
+Значением могут быть числа, строки(если есть пробелы, то строка должна быть в кавычках), отдельные символы.
+
+Запись/перезапись переменной:
+<имя переменной>=<значение> - пробелов около = быть не должно.
+path=~/Docs
+
+Чтение:
+$<имя> или ${<имя>}
+path2=$path/file.txt  # path2==~/Docs/file.txt
+echo "Path is $path2"  # Path is ~/Docs/file.txt. В строку подставляется значение path2
+echo "Path is ${path}2"  # Path is ~/Docs2. Фигурными скобками явно указано имя переменной path, к которому добавлено 2
+
+Напишем и запустим скрипт:
+#! /usr/bin/bash
+  
+dir_path=~/lesson/test_dir/
+file_path=$dir_path/test_file.txt
+
+echo "Creating file $file_path"
+touch $file_path
+echo "Checking content of dir $dir_path"
+ls $dir_path
+
+Вывод:
+Creating file /home/petr/lesson/test_dir//test_file.txt
+Checking content of dir /home/petr/lesson/test_dir/
+test_file.txt
+
+echo вывело сообщения о создании файла и проверке содержимого директории, и выполнилась команда ls. Но при этом в строке Creating file /home/petr/lesson/test_dir//test_file.txt появился удвоенный слеш.
+Это произошло, потому что слеш есть в значении переменной dir_path=~/lesson/test_dir/ и в значкении переменной file_path=$dir_path/test_file.txt.
+Если убрать слеш в file_path=$dir_pathtest_file.txt, bash будет считать именем переменной все что идет до точки $dir_pathtest_file. Т.к. такой переменной нет, file_path будет присвоено значение .txt
+Вывод:
+Creating file .txt  # создается скрытый файл в текущей директории
+Checking content of dir /home/petr/lesson/test_dir/  # в директории dir_path ничего не создано
+
+Чтобы решить эту проблему фигурными скобками явно указываем имя имя переменной:
+#! /usr/bin/bash
+  
+dir_path=~/lesson/test_dir/
+file_path=${dir_path}test_file.txt
+
+echo "Creating file $file_path"
+touch $file_path
+echo "Checking content of dir $dir_path"
+ls $dir_path
+Вывод:
+Creating file /home/petr/lesson/test_dir/test_file.txt
+Checking content of dir /home/petr/lesson/test_dir/
+test_file.txt
+
+bash разделяет двойные и одинарные кавычки:
+#! /usr/bin/bash
+var="Hello, world!"
+echo '$var'
+echo "$var"
+Вывод:
+$var
+Hello, world!
+
+Аргументы
+Передача аргументов скрипту:
+script.sh arg1 arg2 arg3...
+
+Обработка аргументов внутри скрипта:
+$1 - первый аргумент
+$2 - второй аргумент
+...
+$0 - имя скрипта
+$# - количество аргументов
+
+var="Первый аргумент равен $1"
+echo "Всего было передано $# аргументов"
+
+Пишем скрипт arguments.sh:
+#! /usr/bin/bash
+var1=$1
+var2=$2
+echo "Script is $0, arguments are $var1 and $var2 (total $#)"
+
+Запускаем:
+chmod +x arguments.sh 
+./arguments.sh test me  # аргументы test и me
+
+Вывод:
+Script is ./arguments.sh, arguments are test and me (total 2)
+
+Если при запуске скрипта указать полный путь, как имя будет использован он же:
+$ /home/petr/lesson/arguments.sh test me
+out: Script is /home/petr/lesson/arguments.sh, arguments are test and me (total 2)
+
+Если вместо двух аргументов передать один:
+$ /home/petr/lesson/arguments.sh "test me"
+ошибки не произойдет. Вместо второго аргумента будет пустая строка:
+out: Script is /home/petr/lesson/arguments.sh, arguments are test me and  (total 1)
+

@@ -1,0 +1,66 @@
+plot '<файл>' using 1:2  # посторить график по файлу; первая колонка - координата x, вторая - y
+plot '<файл>' using 1:2, '<файл>' using 1:3  # - построить два графика по файлу; первая колонка - координата x, вторая и третья - координата y
+
+set title '<название>'  # добавить название к графику
+
+set xlabel '<название>'
+set ylabel '<название>'  # добавить название осей
+
+plot '<файл>' using 1:2 title '<название>'  # добавить название ряду данных
+set key autotitle columnhead  # брать название ряда данных из верхней строки файла
+
+set xtics <число>
+set ytics <число>  # установить количество отсечек на осях
+
+set xrange [от:до]
+set yrange [от:до]  # установить границы значений на осях
+
+set xtics('0' 0.0, '1/4' 0.25, '1/2' 0.5, '3/4' 0.75, '1' 1.0,)  # задать надписи на отсечках
+
+set logscale y  # логарифмическая шкала для оси OY
+
+set autoscale xy  # установить автомасштабирование осей(по умолчанию)
+unset autoscale z  # отменить автомасштабирование
+
+plot '<>' using 1:2 smooth csplines with lines lt -1  # посторить сглаженную (smooth) методом csplines линию типа (lt) -1 (черного цвета)
+plot '<файл>' using 1:2 with points pointsize 1 pointtype 10 lt 1  # задаем размер, тип и цвет точек на графике
+
+
+Потоковый режим
+Создаем скрипт:
+#!/usr/bin/gnuplot -persist - gnuplot допускает использование одного дефиса перед опциями с длинными именами
+set terminal png enchanced - указываем тип изображения, которое мы хотим сохранить
+set output "plot.png" - указываем куда сохранить
+set ...
+plot ...
+
+Запускаем скрипт:
+gnuplot --persist <имя скрипта>
+или
+chmod +x <имя скрипта>
+./<имя скрипта>
+
+set size ratio <число>  # задает отношение сторон картинки
+
+set grid  # долбавляет сетку
+
+Для запуска скрипта на других данных меняем в скрипте источник.
+Можем сохранить результат в другой файл, изменив строку set output.
+Чтобы не переписывать скрипт, используем переменные:
+#! /usr/bin/gnuplot -persist
+out_name = "plot.png"
+in_name = "data2.csv"
+column_1 = 2
+column_2 = 3
+
+И применяем переменные в тексте:
+plot in_name using 1:column_1 smooth csplines notitle with lines lt 1,\
+in_name using 1:column_1 with points pointsize 1 pointtype 7 lt 1,\
+in_name using 1:column_2 smooth csplines notitle with lines lt 2,\
+in_name using 1:column_2 with points pointsize 1 pointtype 13 lt 2
+
+Переменные можно конкатенировать с текстом, используя точки:
+set title "График для данных в файле ".in_name." столбцы ".column_1.", ".column_2
+
+Значения для переменных можно передать в командной строке при запуске скрипта, использовав опцию -e:
+gnuplot -e "out_name='new_plot.png'; in_name='data.csv'" plot_advanced2.gnu
